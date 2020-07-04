@@ -152,6 +152,6 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
 
     static void refill (Gtk.Button button, ColorListModel colors) {
         colors.size = 0;
-        button.add_tick_callback (add_colors, colors); // Bug
+        button.add_tick_callback (add_colors, colors); // Bug: don't accept user_data
     }
 }
