@@ -5,7 +5,7 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
     }
 
     construct {
-        colors = new Gtk4Demo.ColorWidget[N_COLORS];
+        colors = new ColorWidget[N_COLORS];
         try {
             var data = GLib.resources_lookup_data (
                 "/github/aeldemery/gtk4_color_list/color.names.txt",
@@ -28,7 +28,7 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
                 var pos = ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | blue;
 
                 if (colors[pos] == null) {
-                    colors[pos] = new Gtk4Demo.ColorWidget (name, red / 255, green / 255, blue / 255);
+                    colors[pos] = new ColorWidget (name, red / 255, green / 255, blue / 255);
                 }
             }
         } catch (GLib.Error error) {
@@ -36,7 +36,7 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
         }
     }
 
-    private Gtk4Demo.ColorWidget[] colors = null;
+    private ColorWidget[] colors = null; /* Internal Data for the ListModel */
 
     private uint _size;
     public uint size {
@@ -57,10 +57,9 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
         }
     }
 
-    public GLib.Object ? get_item (uint position) {
-        if (position >= size) {
-            return null;
-        }
+    public GLib.Object ? get_item (uint position)
+    requires (position < size && position >= 0) /* One less than size */
+    {
         var pos = position_to_color (position);
 
         if (colors[pos] == null) {
@@ -69,14 +68,14 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
             green = (pos >> 8) & 0xFF;
             blue = pos & 0xFF;
 
-            colors[pos] = new Gtk4Demo.ColorWidget ("", red / 255, green / 255, blue / 255);
+            colors[pos] = new ColorWidget ("", red / 255, green / 255, blue / 255);
         }
 
         return colors[pos];
     }
 
     public GLib.Type get_item_type () {
-        return typeof (Gtk4Demo.ColorWidget);
+        return typeof (ColorWidget);
     }
 
     public uint get_n_items () {

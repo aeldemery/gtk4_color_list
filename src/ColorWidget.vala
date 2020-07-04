@@ -86,17 +86,13 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
         (snapshot as Gtk.Snapshot).append_color (this.color, { { 0, 0 }, { (float) width, (float) height } });
     }
 
-    public Gdk.Paintable get_current_image () {
-        return (this.snapshot as Gtk.Snapshot).to_paintable (null);
-    }
+    // public double get_intrinsic_aspect_ratio () {
+    // return 0.5;
+    // }
 
-    public double get_intrinsic_aspect_ratio () {
-        return 0.5;
-    }
-
-    public Gdk.PaintableFlags get_flags () {
-        return Gdk.PaintableFlags.STATIC_SIZE;
-    }
+    // public Gdk.PaintableFlags get_flags () {
+    // return Gdk.PaintableFlags.STATIC_CONTENTS;
+    // }
 
     public int get_intrinsic_height () {
         return 32;
@@ -106,15 +102,7 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
         return 32;
     }
 
-    // public override void measure (Gtk.Orientation orientation,
-    // int for_size,
-    // out int size, out int nat,
-    // out int baseline, out int nat_baseline) {
-    // size = nat = 32;
-    // baseline = nat_baseline = -1;
-    // }
-
-    public void rgb_to_hsv (Gdk.RGBA rgba, out double h_out, out double s_out, out double v_out) {
+    public static void rgb_to_hsv (Gdk.RGBA rgba, out double h_out, out double s_out, out double v_out) {
         var red = rgba.red;
         var green = rgba.green;
         var blue = rgba.blue;
@@ -174,7 +162,7 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
         h_out = h; s_out = s; v_out = v;
     }
 
-    public string ? get_rgb_markup (ColorWidget ? color) {
+    public static string ? get_rgb_markup (ColorWidget ? color) {
         if (color == null) return null;
         return "<b>R:</b> %d <b>G:</b> %d <b>B:</b> %d".printf (
             (int) (color.red * 255),
@@ -183,7 +171,7 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
         );
     }
 
-    public string ? get_hsv_markup (ColorWidget ? color) {
+    public static string ? get_hsv_markup (ColorWidget ? color) {
         if (color == null) return null;
         return "<b>H:</b> %d <b>S:</b> %d <b>V:</b> %d".printf (
             color.hue,
