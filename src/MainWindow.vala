@@ -1,6 +1,25 @@
+using Gtk;
 public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
 
-    public ColorListModel color_list_model;
+    /* Some Widgets */
+    HeaderBar header;  ScrolledWindow sw; Box box; DropDown dropdown;
+    Grid grid; GridView selection_view; GridView gridview;
+    Revealer selection_info_revealer; Picture selection_average_picture;
+    ToggleButton selection_info_toggle; Label selection_size_label;
+    Button button; Label label;
+
+    ListItemFactory factory;
+    GLib.ListStore factories; GLib.ListStore sorters;
+    GLib.ListModel model; GLib.ListModel selection_filter; GLib.ListModel no_selection;
+    Sorter sorter; Sorter multi_sorter;
+
+    Expression expression;
+
+    Pango.AttrList attrs;
+    CssProvider provider;
+
+    ColorListModel color_list_model;
+
 
     public MainWindow (Gtk.Application app) {
         Object (
@@ -12,21 +31,21 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         this.title = "Colors";
         this.set_default_size (600, 400);
 
-        var provider = new Gtk.CssProvider ();
+        provider = new Gtk.CssProvider ();
         provider.load_from_resource ("/github/aeldemery/gtk4_color_list/listview_colors.css");
-        Gtk.StyleContext.add_provider_for_display (Gdk.Display.get_default (), provider, 800);
+        StyleContext.add_provider_for_display (Gdk.Display.get_default (), provider, 800);
 
-        var header = new Gtk.HeaderBar ();
+        header = new Gtk.HeaderBar ();
         header.show_title_buttons = true;
         this.set_titlebar (header);
 
-        var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+        box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
         this.set_child (box);
 
-        var selection_info_revealer = new Gtk.Revealer ();
+        selection_info_revealer = new Gtk.Revealer ();
         box.append (selection_info_revealer);
 
-        var grid = new Gtk.Grid ();
+        grid = new Gtk.Grid ();
         selection_info_revealer.set_child (grid);
         with (grid) {
             margin_start = margin_end = margin_top = margin_bottom = 10;
@@ -34,17 +53,19 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
             column_spacing = 10;
         }
 
-        var label = new Gtk.Label ("Selection");
+        label = new Gtk.Label ("Selection");
         label.hexpand = true;
         label.add_css_class ("title-3");
         grid.attach (label, 0, 0, 5, 1);
+
         grid.attach (new Gtk.Label ("Size:"), 0, 2, 1, 1);
 
-        var selection_size_label = new Gtk.Label ("0");
+        selection_size_label = new Gtk.Label ("0");
         grid.attach (selection_size_label, 1, 2, 1, 1);
+
         grid.attach (new Gtk.Label ("Average:"), 2, 2, 1, 1);
 
-        var selection_average_picture = new Gtk.Picture ();
+        selection_average_picture = new Gtk.Picture ();
         selection_average_picture.set_size_request (32, 32);
         grid.attach (selection_average_picture, 3, 2, 1, 1);
 
@@ -53,30 +74,56 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
 
         grid.attach (label, 4, 2, 1, 1);
 
-        var scrolled_win = new Gtk.ScrolledWindow ();
-        scrolled_win.hexpand = true;
-        scrolled_win.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+        sw = new Gtk.ScrolledWindow ();
+        sw.hexpand = true;
+        sw.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
 
-        grid.attach (scrolled_win, 0, 1, 5, 1);
+        grid.attach (sw, 0, 1, 5, 1);
 
-        var factory = new Gtk.SignalListItemFactory ();
-        factory.setup.connect (setup_selection_listitem_cb);
+        factory = new SignalListItemFactory ();
+        (factory as SignalListItemFactory).setup.connect (setup_selection_listitem_cb);
 
-        var selection_view = new Gtk.GridView.with_factory (factory);
+        selection_view = new Gtk.GridView.with_factory (factory);
         selection_view.add_css_class ("compact");
         selection_view.max_columns = 200;
-        scrolled_win.set_child (selection_view);
+        sw.set_child (selection_view);
 
-        scrolled_win = new Gtk.ScrolledWindow ();
-        box.append (scrolled_win);
+        sw = new Gtk.ScrolledWindow ();
+        box.append (sw);
 
-        var gridview = create_color_grid ();
-        scrolled_win.set_child (gridview);
-        scrolled_win.hexpand = true;
-        scrolled_win.vexpand = true;
+        gridview = create_color_grid ();
+        sw.set_child (gridview);
+        sw.hexpand = true;
+        sw.vexpand = true;
 
-        var model = gridview.model;
-        var selection_filter = new Gtk.SelctionFilterModel();
+        model = gridview.model;
+        selection_filter = new Gtk.SelectionFilterModel (model as SelectionModel);
+        selection_filter.items_changed.connect (update_selection_count);
+        selection_filter.items_changed.connect (update_selection_average);
+
+        no_selection = new Gtk.NoSelection (selection_filter);
+        selection_view.model = no_selection;
+
+        model.get ("model", model); /* I don't understand getting the model property form inside model!! */
+
+        selection_info_toggle = new Gtk.ToggleButton ();
+        selection_info_toggle.icon_name = "emblem-important-symbolic";
+        selection_info_toggle.tooltip_text = "Show selection info";
+
+        header.pack_start (selection_info_toggle);
+
+        selection_info_toggle.bind_property ("active", selection_info_revealer, "reveal-child");
+
+        button = new Gtk.Button.with_mnemonic ("_Refill");
+        //color_list_model = (model as Gtk.SortListModel).get_model();
+        button.clicked.connect (refill);
+
+        header.pack_start (button);
+
+        label = new Label("0 /");
+        attrs = new Pango.AttrList();
+        attrs.insert( new Pango.AttrFontFeatures("tnum"));
+        label.attributes = attrs;
     }
 
     void setup_simple_listitem_cb (Gtk.ListItemFactory factory, Gtk.ListItem list_item) {
@@ -142,11 +189,11 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         list_item.set_child (picture);
     }
 
-    static void set_title (Object item, string title) {
+    static void set_the_title (Object item, string title) {
         item.set_data ("title", title);
     }
 
-    static string get_title (Object item) {
+    static string get_the_title (Object item) {
         return item.get_data<string>("title");
     }
 
@@ -227,11 +274,11 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         label.label = limit.to_string ();
     }
 
-    void update_selection_count (GLib.ListModel model, uint position, uint removed, uint added, Object data) {
-        (data as Gtk.Label).label = model.get_n_items ().to_string ();
+    void update_selection_count (GLib.ListModel model, uint position, uint removed, uint added) {
+        selection_size_label.label = model.get_n_items ().to_string ();
     }
 
-    void update_selection_average (GLib.ListModel model, uint position, uint removed, uint added, Object data) {
+    void update_selection_average (GLib.ListModel model, uint position, uint removed, uint added) {
         uint n = model.get_n_items ();
         Gdk.RGBA c = { 0, 0, 0, 1 };
         ColorWidget color;
@@ -245,6 +292,6 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
 
         color = new ColorWidget ("", c.red / n, c.green / n, c.blue / n);
 
-        (data as Gtk.Picture).set_paintable (color);
+        selection_average_picture.set_paintable (color);
     }
 }
