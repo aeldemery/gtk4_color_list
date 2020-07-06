@@ -2,5 +2,6 @@
 <gresources>
     <gresource prefix="/github/aeldemery/gtk4_color_list">
         <file>color.names.txt</file>
+        <file>listview_colors.css</file>
     </gresource>
 </gresources>
