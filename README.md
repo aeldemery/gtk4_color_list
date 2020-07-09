@@ -9,4 +9,4 @@ Help Appreciated!
 
 ## Screenshot
 
-[Screenshot 1](https://github.com/aeldemery/gtk4_color_list/blob/master/Screenshot%201.png)
+![Screenshot 1](https://github.com/aeldemery/gtk4_color_list/blob/master/Screenshot%201.png)
