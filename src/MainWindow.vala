@@ -115,15 +115,73 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         selection_info_toggle.bind_property ("active", selection_info_revealer, "reveal-child");
 
         button = new Gtk.Button.with_mnemonic ("_Refill");
-        //color_list_model = (model as Gtk.SortListModel).get_model();
+        // color_list_model = (model as Gtk.SortListModel).get_model();
         button.clicked.connect (refill);
 
         header.pack_start (button);
 
-        label = new Label("0 /");
-        attrs = new Pango.AttrList();
-        attrs.insert( new Pango.AttrFontFeatures("tnum"));
+        label = new Label ("0 /");
+        attrs = new Pango.AttrList ();
+        attrs.insert (new Pango.AttrFontFeatures ("tnum"));
         label.attributes = attrs;
+        label.width_chars = "4096".length + 2;
+        label.xalign = 1;
+
+        gridview.model.items_changed.connect (items_changed_cb);
+
+        header.pack_start (label);
+
+        dropdown = new DropDown ();
+        dropdown.set_from_strings ({ "8", "64", "512", "4096", "32768", "262144", "2097152", "16777216" });
+        dropdown.notify["selected"].connect (limit_changed_cb);
+        dropdown.notify["selected"].connect (limit_changed_cb2);
+
+        factory = new SignalListItemFactory ();
+        (factory as SignalListItemFactory).setup.connect (setup_number_item);
+        (factory as SignalListItemFactory).bind.connect (bind_number_item);
+
+        dropdown.factory = factory;
+        dropdown.selected = 3; /* 4096 */
+
+        header.pack_start (dropdown);
+
+        sorters = new GLib.ListStore (typeof (Sorter));
+
+        /* An empty multisorter doesn't do any sorting and the sortmodel is
+         * smart enough to know that.
+         */
+        sorter = new MultiSorter ();
+        set_the_title (sorter, "Unsorted");
+        sorters.append (sorter);
+
+        sorter = new StringSorter (new PropertyExpression (typeof (ColorWidget), null, "name"));
+        set_the_title (sorter, "Name");
+        sorters.append (sorter);
+
+        multi_sorter = new MultiSorter ();
+
+        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "red"));
+        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
+        set_the_title (sorter, "Red");
+        sorters.append (sorter);
+        (multi_sorter as MultiSorter).append (sorter);
+
+        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "green"));
+        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
+        set_the_title (sorter, "Green");
+        sorters.append (sorter);
+        (multi_sorter as MultiSorter).append (sorter);
+
+        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "blue"));
+        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
+        set_the_title (sorter, "Blue");
+        sorters.append (sorter);
+        (multi_sorter as MultiSorter).append (sorter);
+
+        set_the_title(multi_sorter, "RGB");
+        sorters.append(multi_sorter);
+
+        multi_sorter = new MultiSorter();
     }
 
     void setup_simple_listitem_cb (Gtk.ListItemFactory factory, Gtk.ListItem list_item) {
@@ -160,7 +218,7 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         box.append (picture);
 
         params[0] = color_expression.ref ();
-        expression = new Gtk.CClosureExpression (typeof (string), null, params, (Callback) ColorWidget.get_rgb_markup, null, null);
+        expression = new Gtk.CClosureExpression (typeof (string), null, params, (GLib.Callback)ColorWidget.get_rgb_markup, null, null);
 
         var rgb_label = new Gtk.Label (null);
         rgb_label.set_use_markup (true);
@@ -169,7 +227,7 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         box.append (rgb_label);
 
         params[0] = color_expression.ref ();
-        expression = new Gtk.CClosureExpression (typeof (string), null, params, (Callback) ColorWidget.get_hsv_markup, null, null);
+        expression = new Gtk.CClosureExpression (typeof (string), null, params, (GLib.Callback)ColorWidget.get_hsv_markup, null, null);
 
         var hsv_label = new Gtk.Label (null);
         hsv_label.set_use_markup (true);
@@ -236,7 +294,8 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         button.add_tick_callback (add_colors);
     }
 
-    void limit_changed_cb (Gtk.DropDown dropdown, GLib.ParamSpec pspec) {
+    void limit_changed_cb (Object object, GLib.ParamSpec pspec) {
+        var dropdown = (DropDown) object;
         uint old_limit = color_list_model.get_data<uint>("limit");
         uint new_limit = 1 << (3 * (dropdown.selected + 1));
 
@@ -246,14 +305,15 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
             color_list_model.size = new_limit;
     }
 
-    void limit_changed_cb2 (Gtk.DropDown dropdown, GLib.ParamSpec pspec, Gtk.Label label) {
+    void limit_changed_cb2 (Object object, GLib.ParamSpec pspec) {
+        var dropdown = (DropDown) object;
         uint limit = 1 << (3 * (dropdown.selected + 1));
         label.width_chars = limit.to_string ().length + 2;
     }
 
-    void items_changed_cb (ListModel model, uint position, uint removed, uint added, Gtk.Widget label) {
+    void items_changed_cb (ListModel model, uint position, uint removed, uint added) {
         uint n = model.get_n_items ();
-        (label as Gtk.Label).label = n.to_string ();
+        label.label = n.to_string ();
     }
 
     void setup_number_item (Gtk.SignalListItemFactory factory, Gtk.ListItem list_item) {
