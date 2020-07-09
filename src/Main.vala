@@ -1,5 +1,3 @@
-public const int N_COLORS = 256 * 256 * 256;
-
 int main (string[] args) {
     var app = new Gtk4Demo.ColorListDemoApp ();
     return app.run (args);

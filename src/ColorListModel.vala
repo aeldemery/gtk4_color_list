@@ -1,3 +1,5 @@
+public const int N_COLORS = 256 * 256 * 256;
+
 public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
 
     public ColorListModel (uint size) {
