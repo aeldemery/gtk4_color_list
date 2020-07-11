@@ -83,7 +83,7 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
     }
 
     public void snapshot (Gdk.Snapshot snapshot, double width, double height) {
-        (snapshot as Gtk.Snapshot).append_color (this.color, { { 0, 0 }, { (float) width, (float) height } });
+        ((Gtk.Snapshot)snapshot).append_color (this.color, { { 0, 0 }, { (float) width, (float) height } });
     }
 
     // public double get_intrinsic_aspect_ratio () {

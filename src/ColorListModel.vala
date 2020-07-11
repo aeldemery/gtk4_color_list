@@ -6,7 +6,7 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
         this.size = size;
     }
 
-    construct {
+    static construct {
         colors = new ColorWidget[N_COLORS];
         try {
             var data = GLib.resources_lookup_data (
@@ -38,7 +38,7 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
         }
     }
 
-    private ColorWidget[] colors = null; /* Internal Data for the ListModel */
+    private static ColorWidget[] colors = null; /* Internal Data for the ListModel */
 
     private uint _size;
     public uint size {

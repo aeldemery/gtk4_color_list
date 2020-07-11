@@ -8,10 +8,10 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
     ToggleButton selection_info_toggle; Label selection_size_label;
     Button button; Label label;
 
-    ListItemFactory factory;
+    SignalListItemFactory factory;
     GLib.ListStore factories; GLib.ListStore sorters;
     GLib.ListModel model; GLib.ListModel selection_filter; GLib.ListModel no_selection;
-    Sorter sorter; Sorter multi_sorter;
+    Sorter generic_sorter; StringSorter string_sorter; NumericSorter numeric_sorter; MultiSorter multi_sorter;
 
     Expression expression;
 
@@ -81,7 +81,7 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         grid.attach (sw, 0, 1, 5, 1);
 
         factory = new SignalListItemFactory ();
-        (factory as SignalListItemFactory).setup.connect (setup_selection_listitem_cb);
+        factory.setup.connect (setup_selection_listitem_cb);
 
         selection_view = new Gtk.GridView.with_factory (factory);
         selection_view.add_css_class ("compact");
@@ -137,8 +137,8 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         dropdown.notify["selected"].connect (limit_changed_cb2);
 
         factory = new SignalListItemFactory ();
-        (factory as SignalListItemFactory).setup.connect (setup_number_item);
-        (factory as SignalListItemFactory).bind.connect (bind_number_item);
+        factory.setup.connect (setup_number_item);
+        factory.bind.connect (bind_number_item);
 
         dropdown.factory = factory;
         dropdown.selected = 3; /* 4096 */
@@ -150,56 +150,56 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         /* An empty multisorter doesn't do any sorting and the sortmodel is
          * smart enough to know that.
          */
-        sorter = new MultiSorter ();
-        set_the_title (sorter, "Unsorted");
-        sorters.append (sorter);
+        generic_sorter = new MultiSorter ();
+        set_the_title (generic_sorter, "Unsorted");
+        sorters.append (generic_sorter);
 
-        sorter = new StringSorter (new PropertyExpression (typeof (ColorWidget), null, "name"));
-        set_the_title (sorter, "Name");
-        sorters.append (sorter);
+        string_sorter = new StringSorter (new PropertyExpression (typeof (ColorWidget), null, "name"));
+        set_the_title (string_sorter, "Name");
+        sorters.append (string_sorter);
 
         multi_sorter = new MultiSorter ();
 
-        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "red"));
-        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
-        set_the_title (sorter, "Red");
-        sorters.append (sorter);
-        (multi_sorter as MultiSorter).append (sorter);
+        numeric_sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "red"));
+        numeric_sorter.set_sort_order (SortType.DESCENDING);
+        set_the_title (numeric_sorter, "Red");
+        sorters.append (numeric_sorter);
+        multi_sorter.append (numeric_sorter);
 
-        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "green"));
-        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
-        set_the_title (sorter, "Green");
-        sorters.append (sorter);
-        (multi_sorter as MultiSorter).append (sorter);
+        numeric_sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "green"));
+        numeric_sorter.set_sort_order (SortType.DESCENDING);
+        set_the_title (numeric_sorter, "Green");
+        sorters.append (numeric_sorter);
+        multi_sorter.append (numeric_sorter);
 
-        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "blue"));
-        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
-        set_the_title (sorter, "Blue");
-        sorters.append (sorter);
-        (multi_sorter as MultiSorter).append (sorter);
+        numeric_sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "blue"));
+        numeric_sorter.set_sort_order (SortType.DESCENDING);
+        set_the_title (numeric_sorter, "Blue");
+        sorters.append (numeric_sorter);
+        multi_sorter.append (numeric_sorter);
 
         set_the_title (multi_sorter, "RGB");
         sorters.append (multi_sorter);
 
         multi_sorter = new MultiSorter ();
 
-        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "hue"));
-        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
-        set_the_title (sorter, "Hue");
-        sorters.append (sorter);
-        (multi_sorter as MultiSorter).append (sorter);
+        numeric_sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "hue"));
+        numeric_sorter.set_sort_order (SortType.DESCENDING);
+        set_the_title (numeric_sorter, "Hue");
+        sorters.append (numeric_sorter);
+        multi_sorter.append (numeric_sorter);
 
-        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "saturation"));
-        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
-        set_the_title (sorter, "Saturation");
-        sorters.append (sorter);
-        (multi_sorter as MultiSorter).append (sorter);
+        numeric_sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "saturation"));
+        numeric_sorter.set_sort_order (SortType.DESCENDING);
+        set_the_title (numeric_sorter, "Saturation");
+        sorters.append (numeric_sorter);
+        multi_sorter.append (numeric_sorter);
 
-        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "value"));
-        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
-        set_the_title (sorter, "Value");
-        sorters.append (sorter);
-        (multi_sorter as MultiSorter).append (sorter);
+        numeric_sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "value"));
+        numeric_sorter.set_sort_order (SortType.DESCENDING);
+        set_the_title (numeric_sorter, "Value");
+        sorters.append (numeric_sorter);
+        multi_sorter.append (numeric_sorter);
 
         set_the_title (multi_sorter, "HSV");
         sorters.append (multi_sorter);
@@ -220,13 +220,13 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         factories = new GLib.ListStore (typeof (ListItemFactory));
 
         factory = new SignalListItemFactory ();
-        (factory as SignalListItemFactory).setup.connect (setup_simple_listitem_cb);
+        factory.setup.connect (setup_simple_listitem_cb);
         set_the_title (factory, "Colors");
 
         factories.append (factory);
 
         factory = new SignalListItemFactory ();
-        (factory as SignalListItemFactory).setup.connect (setup_listitem_cb);
+        factory.setup.connect (setup_listitem_cb);
         set_the_title (factory, "Everything");
 
         factories.append (factory);
