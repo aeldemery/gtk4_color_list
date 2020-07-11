@@ -178,10 +178,71 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         sorters.append (sorter);
         (multi_sorter as MultiSorter).append (sorter);
 
-        set_the_title(multi_sorter, "RGB");
-        sorters.append(multi_sorter);
+        set_the_title (multi_sorter, "RGB");
+        sorters.append (multi_sorter);
 
-        multi_sorter = new MultiSorter();
+        multi_sorter = new MultiSorter ();
+
+        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "hue"));
+        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
+        set_the_title (sorter, "Hue");
+        sorters.append (sorter);
+        (multi_sorter as MultiSorter).append (sorter);
+
+        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "saturation"));
+        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
+        set_the_title (sorter, "Saturation");
+        sorters.append (sorter);
+        (multi_sorter as MultiSorter).append (sorter);
+
+        sorter = new NumericSorter (new PropertyExpression (typeof (ColorWidget), null, "value"));
+        (sorter as NumericSorter).set_sort_order (SortType.DESCENDING);
+        set_the_title (sorter, "Value");
+        sorters.append (sorter);
+        (multi_sorter as MultiSorter).append (sorter);
+
+        set_the_title (multi_sorter, "HSV");
+        sorters.append (multi_sorter);
+
+        dropdown = new DropDown ();
+        box = new Box (Orientation.HORIZONTAL, 10);
+
+        box.append (new Label ("Sort by:"));
+        box.append (dropdown);
+
+        header.pack_end (box);
+
+        expression = new CClosureExpression (typeof (string), null, null, (GLib.Callback)get_the_title, null, null);
+        dropdown.expression = expression;
+        dropdown.model = sorters;
+        dropdown.bind_property ("selected-item", model, "sorter", BindingFlags.SYNC_CREATE);
+
+        factories = new GLib.ListStore (typeof (ListItemFactory));
+
+        factory = new SignalListItemFactory ();
+        (factory as SignalListItemFactory).setup.connect (setup_simple_listitem_cb);
+        set_the_title (factory, "Colors");
+
+        factories.append (factory);
+
+        factory = new SignalListItemFactory ();
+        (factory as SignalListItemFactory).setup.connect (setup_listitem_cb);
+        set_the_title (factory, "Everything");
+
+        factories.append (factory);
+
+        dropdown = new DropDown ();
+        box = new Box (Orientation.HORIZONTAL, 10);
+
+        box.append (new Label ("Show:"));
+        box.append (dropdown);
+
+        header.pack_end (box);
+
+        expression = new CClosureExpression (typeof (string), null, null, (GLib.Callback)get_the_title, null, null);
+        dropdown.expression = expression;
+        dropdown.model = factories;
+        dropdown.bind_property ("selected-item", gridview, "factory", BindingFlags.SYNC_CREATE);
     }
 
     void setup_simple_listitem_cb (Gtk.ListItemFactory factory, Gtk.ListItem list_item) {
