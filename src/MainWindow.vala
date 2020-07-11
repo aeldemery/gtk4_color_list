@@ -97,14 +97,14 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         sw.vexpand = true;
 
         model = gridview.model;
-        selection_filter = new Gtk.SelectionFilterModel (model as SelectionModel);
+        selection_filter = new SelectionFilterModel (model as SelectionModel);
         selection_filter.items_changed.connect (update_selection_count);
         selection_filter.items_changed.connect (update_selection_average);
 
         no_selection = new Gtk.NoSelection (selection_filter);
         selection_view.model = no_selection;
 
-        model.get ("model", model); /* I don't understand getting the model property form inside model!! */
+        color_list_model.get ("model", model); /* I don't understand getting the model property form inside model!! */
 
         selection_info_toggle = new Gtk.ToggleButton ();
         selection_info_toggle.icon_name = "emblem-important-symbolic";
@@ -331,7 +331,9 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
             enable_rubberband = true;
         }
 
-        var model = new Gtk.SortListModel (new ColorListModel (0), null);
+        color_list_model = new ColorListModel(0);
+
+        model = new SortListModel (color_list_model, null);
         var selection = new Gtk.MultiSelection (model);
 
         gridview.model = selection;
