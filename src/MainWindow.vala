@@ -105,6 +105,7 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         selection_view.model = no_selection;
 
         color_list_model.get ("model", model);
+        //model.get("model", color_list_model);
 
         selection_info_toggle = new Gtk.ToggleButton ();
         selection_info_toggle.icon_name = "emblem-important-symbolic";

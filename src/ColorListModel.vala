@@ -93,11 +93,11 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
             0x030000, 0x000300, 0x000003,
             0x010000, 0x000100, 0x000001
         };
-        uint i = 0, result = 0;
-        foreach (var element in map) {
+        
+        uint result = 0;
+        for (uint i = 0; i < map.length; i++) {
             if ((position & (1 << i)) > 0) {
                 result ^= map[i];
-                i++;
             }
         }
         return result;
