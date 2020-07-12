@@ -104,7 +104,7 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         no_selection = new Gtk.NoSelection (selection_filter);
         selection_view.model = no_selection;
 
-        color_list_model.get ("model", model); /* I don't understand getting the model property form inside model!! */
+        color_list_model.get ("model", model);
 
         selection_info_toggle = new Gtk.ToggleButton ();
         selection_info_toggle.icon_name = "emblem-important-symbolic";
@@ -115,7 +115,6 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         selection_info_toggle.bind_property ("active", selection_info_revealer, "reveal-child");
 
         button = new Gtk.Button.with_mnemonic ("_Refill");
-        // color_list_model = (model as Gtk.SortListModel).get_model();
         button.clicked.connect (refill);
 
         header.pack_start (button);
@@ -154,7 +153,7 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         set_the_title (generic_sorter, "Unsorted");
         sorters.append (generic_sorter);
 
-        string_sorter = new StringSorter (new PropertyExpression (typeof (ColorWidget), null, "name"));
+        string_sorter = new StringSorter (new PropertyExpression (typeof (ColorWidget), null, "color-name"));
         set_the_title (string_sorter, "Name");
         sorters.append (string_sorter);
 
@@ -331,7 +330,7 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
             enable_rubberband = true;
         }
 
-        color_list_model = new ColorListModel(0);
+        color_list_model = new ColorListModel (0);
 
         model = new SortListModel (color_list_model, null);
         var selection = new Gtk.MultiSelection (model);

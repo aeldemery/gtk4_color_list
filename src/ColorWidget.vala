@@ -3,6 +3,7 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
     public ColorWidget (string name, float r, float g, float b) {
         _color = { r, g, b, 1.0f };
         this.color_name = name;
+        this.color = _color;
     }
 
     construct {
@@ -10,7 +11,7 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
     // Properties
     public string color_name { get; set; }
 
-    private Gdk.RGBA _color;
+    private Gdk.RGBA _color = { 1f, 1f, 1f, 1f };
     public Gdk.RGBA color {
         get {
             return _color;
@@ -19,9 +20,9 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
             _color = value;
             double h_local, s_local, v_local;
             rgb_to_hsv (_color, out h_local, out s_local, out v_local);
-            _h = (int) GLib.Math.round (360 * h_local);
-            _s = (int) GLib.Math.round (100 * s_local);
-            _v = (int) GLib.Math.round (100 * v_local);
+            _hue = (int) GLib.Math.round (360 * h_local);
+            _saturation = (int) GLib.Math.round (100 * s_local);
+            _value = (int) GLib.Math.round (100 * v_local);
         }
     }
 
@@ -29,17 +30,11 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
         get {
             return _color.red;
         }
-        set {
-            _color.red = value;
-        }
     }
 
     public float green {
         get {
             return _color.green;
-        }
-        set {
-            _color.green = value;
         }
     }
 
@@ -47,52 +42,23 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
         get {
             return _color.blue;
         }
-        set {
-            _color.blue = value;
-        }
     }
 
-    int _h;
     public int hue {
-        get {
-            return _h;
-        }
-        set {
-            _h = value;
-        }
+        get; default = 360;
     }
 
-    int _s;
     public int saturation {
-        get {
-            return _s;
-        }
-        set {
-            _s = value;
-        }
+        get; default = 100;
     }
 
-    int _v;
     public int value {
-        get {
-            return _v;
-        }
-        set {
-            _v = value;
-        }
+        get; default = 100;
     }
 
     public void snapshot (Gdk.Snapshot snapshot, double width, double height) {
         ((Gtk.Snapshot)snapshot).append_color (this.color, { { 0, 0 }, { (float) width, (float) height } });
     }
-
-    // public double get_intrinsic_aspect_ratio () {
-    // return 0.5;
-    // }
-
-    // public Gdk.PaintableFlags get_flags () {
-    // return Gdk.PaintableFlags.STATIC_CONTENTS;
-    // }
 
     public int get_intrinsic_height () {
         return 32;

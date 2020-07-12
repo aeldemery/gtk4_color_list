@@ -6,18 +6,18 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
         this.size = size;
     }
 
+    private static ColorWidget[] colors = new ColorWidget[N_COLORS]; /* Internal Data for the ListModel */
+
     static construct {
-        colors = new ColorWidget[N_COLORS];
         try {
             var data = GLib.resources_lookup_data (
                 "/github/aeldemery/gtk4_color_list/color.names.txt",
                 GLib.ResourceLookupFlags.NONE
             );
 
-            var lines = ((string) data).split ("\n");
-            int i = 0;
+            var lines = ((string) data.get_data ()).split ("\n");
             foreach (var line in lines) {
-                if (line.has_prefix ("#") || line.has_prefix ("\0")) {
+                if ((line.get (0) == '#') || (line.get (0) == '\0')) {
                     continue;
                 }
                 var fields = line.split (" ");
@@ -27,10 +27,10 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
                 var green = int.parse (fields[4]);
                 var blue = int.parse (fields[5]);
 
-                var pos = ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | blue;
+                uint pos = ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | blue;
 
                 if (colors[pos] == null) {
-                    colors[pos] = new ColorWidget (name, red / 255, green / 255, blue / 255);
+                    colors[pos] = new ColorWidget (name, red / 255f, green / 255f, blue / 255f);
                 }
             }
         } catch (GLib.Error error) {
@@ -38,9 +38,7 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
         }
     }
 
-    private static ColorWidget[] colors = null; /* Internal Data for the ListModel */
-
-    private uint _size;
+    private uint _size = N_COLORS;
     public uint size {
         get {
             return _size;
@@ -60,7 +58,7 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
     }
 
     public GLib.Object ? get_item (uint position)
-    requires (position < size && position >= 0) /* One less than size */
+    requires (position < size) /* One less than size? */
     {
         var pos = position_to_color (position);
 
@@ -70,7 +68,7 @@ public class Gtk4Demo.ColorListModel : GLib.Object, GLib.ListModel {
             green = (pos >> 8) & 0xFF;
             blue = pos & 0xFF;
 
-            colors[pos] = new ColorWidget ("", red / 255, green / 255, blue / 255);
+            colors[pos] = new ColorWidget ("", red / 255f, green / 255f, blue / 255f);
         }
 
         return colors[pos];
