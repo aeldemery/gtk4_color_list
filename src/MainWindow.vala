@@ -1,5 +1,5 @@
 using Gtk;
-public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
+public class Gtk4Demo.MainWindow : ApplicationWindow {
 
     /* Some Widgets */
     HeaderBar header;  ScrolledWindow sw; Box box; DropDown dropdown;
@@ -104,8 +104,10 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
         no_selection = new Gtk.NoSelection (selection_filter);
         selection_view.model = no_selection;
 
-        color_list_model.get ("model", model);
-        //model.get("model", color_list_model);
+        // color_list_model.get ("model", model);
+        // model.get("model", color_list_model);
+        // SortListModel gridview_sorter;
+        var gridview_multiselection = (MultiSelection) gridview.model;
 
         selection_info_toggle = new Gtk.ToggleButton ();
         selection_info_toggle.icon_name = "emblem-important-symbolic";
@@ -214,8 +216,9 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
 
         expression = new CClosureExpression (typeof (string), null, null, (GLib.Callback)get_the_title, null, null);
         dropdown.expression = expression;
+        
         dropdown.model = sorters;
-        dropdown.bind_property ("selected-item", model, "sorter", BindingFlags.SYNC_CREATE);
+        dropdown.bind_property ("selected-item", gridview_multiselection.model, "sorter", BindingFlags.SYNC_CREATE);
 
         factories = new GLib.ListStore (typeof (ListItemFactory));
 
@@ -333,8 +336,8 @@ public class Gtk4Demo.MainWindow : Gtk.ApplicationWindow {
 
         color_list_model = new ColorListModel (0);
 
-        model = new SortListModel (color_list_model, null);
-        var selection = new Gtk.MultiSelection (model);
+        var gridmodel = new SortListModel (color_list_model, null);
+        var selection = new Gtk.MultiSelection (gridmodel);
 
         gridview.model = selection;
 

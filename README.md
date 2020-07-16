@@ -4,8 +4,7 @@
  This software is released under the MIT License.
  https://opensource.org/licenses/MIT
 -->
-Currently brocken!!
-Help Appreciated!
+Work in Progress, thanks for the folks on #gtk channels
 
 ## Screenshot
 
