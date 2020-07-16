@@ -107,7 +107,7 @@ public class Gtk4Demo.MainWindow : ApplicationWindow {
         // color_list_model.get ("model", model);
         // model.get("model", color_list_model);
         // SortListModel gridview_sorter;
-        var gridview_multiselection = (MultiSelection) gridview.model;
+        var gridview_multiselection = gridview.model as MultiSelection;
 
         selection_info_toggle = new Gtk.ToggleButton ();
         selection_info_toggle.icon_name = "emblem-important-symbolic";
@@ -271,13 +271,13 @@ public class Gtk4Demo.MainWindow : ApplicationWindow {
         expression = new Gtk.PropertyExpression (typeof (ColorWidget), color_expression.ref (), "color-name");
 
         var name_label = new Gtk.Label (null);
-        expression.bind (name_label, "label", null);
+        expression.bind (name_label, "label", name_label);
 
         box.append (name_label);
 
         expression = color_expression.ref ();
         var picture = new Gtk.Picture ();
-        expression.bind (picture, "paintable", null);
+        expression.bind (picture, "paintable", picture);
 
         box.append (picture);
 
@@ -286,7 +286,7 @@ public class Gtk4Demo.MainWindow : ApplicationWindow {
 
         var rgb_label = new Gtk.Label (null);
         rgb_label.set_use_markup (true);
-        expression.bind (rgb_label, "label", null);
+        expression.bind (rgb_label, "label", rgb_label);
 
         box.append (rgb_label);
 
@@ -295,7 +295,7 @@ public class Gtk4Demo.MainWindow : ApplicationWindow {
 
         var hsv_label = new Gtk.Label (null);
         hsv_label.set_use_markup (true);
-        expression.bind (hsv_label, "label", null);
+        expression.bind (hsv_label, "label", hsv_label);
 
         box.append (hsv_label);
     }
@@ -307,7 +307,7 @@ public class Gtk4Demo.MainWindow : ApplicationWindow {
 
         var picture = new Gtk.Picture ();
         picture.set_size_request (8, 8);
-        color_expression.bind (picture, "paintable", null);
+        color_expression.bind (picture, "paintable", picture);
         list_item.set_child (picture);
     }
 
