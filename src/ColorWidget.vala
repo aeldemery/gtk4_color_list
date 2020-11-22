@@ -6,8 +6,6 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
         this.color = _color;
     }
 
-    construct {
-    }
     // Properties
     public string color_name { get; set; }
 
@@ -69,63 +67,7 @@ public class Gtk4Demo.ColorWidget : GLib.Object, Gdk.Paintable {
     }
 
     public static void rgb_to_hsv (Gdk.RGBA rgba, out double h_out, out double s_out, out double v_out) {
-        var red = rgba.red;
-        var green = rgba.green;
-        var blue = rgba.blue;
-
-        double min, max, delta;
-        double h = 0.0, s = 0.0, v = 0.0;
-
-        if (red > green) {
-            if (red > blue)
-                max = red;
-            else
-                max = blue;
-
-            if (green < blue)
-                min = green;
-            else
-                min = blue;
-        } else {
-            if (green > blue)
-                max = green;
-            else
-                max = blue;
-
-            if (red < blue)
-                min = red;
-            else
-                min = blue;
-        }
-
-        v = max;
-
-        if (max != 0.0)
-            s = (max - min) / max;
-        else
-            s = 0.0;
-
-        if (s == 0.0)
-            h = 0.0;
-        else {
-            delta = max - min;
-
-            if (red == max)
-                h = (green - blue) / delta;
-            else if (green == max)
-                h = 2 + (blue - red) / delta;
-            else if (blue == max)
-                h = 4 + (red - green) / delta;
-
-            h /= 6.0;
-
-            if (h < 0.0)
-                h += 1.0;
-            else if (h > 1.0)
-                h -= 1.0;
-        }
-
-        h_out = h; s_out = s; v_out = v;
+        Gtk.rgb_to_hsv (rgba.red, rgba.green, rgba.blue, out h_out, out s_out, out v_out);
     }
 
     public static string ? get_rgb_markup (ColorWidget ? color) {
