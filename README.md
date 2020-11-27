@@ -4,7 +4,8 @@
  This software is released under the MIT License.
  https://opensource.org/licenses/MIT
 -->
-Work in Progress, thanks for the folks on #gtk channels
+The code in this repository is mostly a direct translation of the c equivalent, so it looks ugly and unmodular.
+That was my first encounter with many new Gtk4 concepts and learned a lot. After digesting those concepts I'm staring a new rewrite of this project at the new repository [gtk4_list_colors](https://github.com/aeldemery/gtk4_list_colors)
 
 ## Screenshot
 
